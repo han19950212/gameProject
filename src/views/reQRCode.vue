@@ -1,0 +1,371 @@
+<template>
+    <div class="recharge123">
+        <div class="exit" @click="exit" v-cursor>x</div>
+        <div class="login_top">
+            <img class="top_img" src="../assets/login/1.png" alt="">
+            <p class="text_bg">TOP-UP</p>
+            <p class="text_zhuce">充值</p>
+            <img class="top_img" src="../assets/login/1.png" alt="">
+        </div>
+
+        <div class="ten_money">
+            <p><span>$</span>{{price}}</p>
+            <p class="chongzhi">充值金额</p>
+        </div>
+        <!--放二维码-->
+<!--        <div class="qrCode">-->
+<!--            <img :src="paySrc" alt="">-->
+<!--        </div>-->
+        <div  id="qrcode" ref="qrcode"></div>
+
+        <div class="rqTishi">
+            <p>用手机扫码支付完成后，请到账户中心查询余额</p>
+        </div>
+        <div class="fanhui" @click="GoBack" v-cursor>
+            <div class="linxing1"></div>
+            <div class="fanhui_back">返回上一步</div>
+        </div>
+    </div>
+</template>
+
+<script>
+    import QRCode from 'qrcodejs2'
+    import Bus from "../axios/Bus"
+    import {GetpayqrCode, PostPayalipy} from '../axios/Apilogin'
+    export default {
+
+        name: '',
+        components: {},
+        props:{
+            imgPrice:{
+                type:String
+            },
+            price:{
+                default:10,
+            },
+            payment:{
+                default:10
+            }
+        },
+        data() {
+            return {
+                img:'',
+                payUrl:null,
+                paySrc:null,
+            }
+        },
+        created() {    
+
+        },
+        mounted() {
+            
+            setTimeout(function(){
+                // console.log(this.imgPrice)
+            },1000)
+           
+            const pri={
+                "money":this.price
+            }
+         
+            PostPayalipy(pri).then((res)=>{//获取payUrl
+                if(res!=undefined){
+                      var img=res.data.payUrl;
+                    this.img=img;
+                    // console.log(img)
+                    this.qrcode()
+                }
+              
+            })
+        },
+        methods:{
+            GoBack(){
+                this.$emit('goback')
+            },
+         
+            //获取二维码的实例 
+            qrcode() {
+                let qrcode = new QRCode('qrcode', {
+                    width: 132,  
+                    height: 132,
+                    text: this.img, // 二维码地址
+                    colorDark : "#000",
+                    colorLight : "#fff",
+                })
+                
+            },
+            exit(){  //点击叉，不显示登陆页面
+                this.$emit('changeExit')
+            },
+        },
+        beforeDestroy() {
+            Bus.$off("payUrl");
+        }
+    }
+</script>
+
+<style scoped>
+    .recharge123{
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 490px;
+        height: 677px;
+        z-index: 70;
+        background-color: #fff;
+        transform: translate(-50%,-50%);
+        -webkit-transform: translate(-50%,-50%);
+        -moz-transform: translate(-50%,-50%);
+        -ms-transform: translate(-50%,-50%);
+        -o-transform: translate(-50%,-50%);
+
+        /* background: linear-gradient(#232123, #65072c); */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-image: url(../assets/recharge/1.png);
+    }
+    .login_top{
+        display: flex;
+        width: 160px;
+        margin: 36px auto 20px;
+        position: relative;
+
+    }
+    .top_img{
+        width: 27px;
+        height: 45px;
+    }
+    .text_zhuce{
+        font-size: 26px;
+        color:#e60f64;
+        width: 105px;
+        text-align: center;
+        line-height: 32px;
+        font-style: oblique;
+        font-weight: 700;
+    }
+    .text_bg{
+        font-size: 25px;
+        font-style: italic;
+        position: absolute;
+        top: 9px;
+        left: 36.5px;
+        color: #2d2d2d;
+        font-weight: 700;
+        z-index: -1;
+    }
+    .login_input{
+        position: relative;
+        width: 365px;
+        height: 42px;
+        margin-top: 40px;
+    }
+    .login_input1{
+        margin-top:39px;
+        cursor:pointer;
+        text-align: center;
+    }
+    .linxing{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: skewX(-15deg);
+        -webkit-transform: skewX(-15deg);
+        -moz-transform: skewX(-15deg);
+        -ms-transform: skewX(-15deg);
+        -o-transform: skewX(-15deg);
+        border: 1px solid #691534;
+        background-color: #151414;
+    }
+    .linxing1{
+        position: absolute;
+        top: 448px;
+        left: 74px;
+        transform: skewX(-15deg);
+        -webkit-transform: skewX(-15deg);
+        -moz-transform: skewX(-15deg);
+        -ms-transform: skewX(-15deg);
+        -o-transform: skewX(-15deg);
+        border: 1px solid #691534;
+        background:linear-gradient(to right,#ba023f,#ff537b);
+        background:-webkit-linear-gradient(to right,#ba023f,#ff537b);
+        background:-moz-linear-gradient(to right,#ba023f,#ff537b);
+        background:-ms-linear-gradient(to right,#ba023f,#ff537b);
+        background:-o-linear-gradient(to right,#ba023f,#ff537b);
+        width: 336px;
+        height: 42px;
+    }
+    .tjiao{
+        font-size: 16px;
+        position: absolute;
+        top:50%;
+        right: 33%;
+        z-index: 2;
+        transform: translate(-50%,-50%);
+        -webkit-transform: translate(-50%,-50%);
+        -moz-transform: translate(-50%,-50%);
+        -ms-transform: translate(-50%,-50%);
+        -o-transform: translate(-50%,-50%);
+        color: #fff;
+        font-style: italic;
+        font-weight: 700;
+    }
+    .ten_money{
+        font-size: 36px;
+        font-weight: 900;
+        font-style: italic;
+        color: #454043;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        position: relative;
+    }
+    .ten_money span{
+        font-size: 26px;
+    }
+    .chongzhi{
+        font-size: 16px;
+        font-weight: 500;
+        margin-top: -5px;
+    }
+    .qrCode{
+        width: 170px;
+        height: 170px;
+    }
+    .qrCode img{
+        width: 170px;
+        height: 170px;
+    }
+    .ten_money_color{
+        position: relative;
+        color: #e60f64;
+        font-size: 42px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-weight: 900;
+        font-style: italic;
+        margin-top: 20px;
+    }
+    .ten_money_color span{
+        font-size: 26px;
+    }
+    .zhifu{
+        font-size: 16px;
+        margin-top: -5px;
+    }
+    .money_box{
+        width: 385px;
+        height: 66px;
+        margin-top: 43px;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .money_left{
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        margin-top: -2px;
+    }
+    .money_left p{
+        font-size: 16px;
+        color:#fff;
+        margin-left: 5px;
+        font-style: italic;
+        font-weight: 900;
+    }
+    .bg{
+        position: absolute;
+        left: 0;
+        top:0
+    }
+    .money_box_1{
+        width: 385px;
+        height: 66px;
+        margin-top: 0px;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .tuixiao{
+        position: relative;
+        display: flex;
+        /* align-items: center; */
+        width: 139px;
+        justify-content: center;
+        color: #fff;
+        font-weight: 900;
+        font-style: italic;
+        font-size: 15px;
+    }
+    .money_box_1 input{
+        position: relative;
+        margin-left: 0px;
+        width: 207px;
+        height: 30px;
+        background: none;
+        text-align: center;
+        border: none;
+    }
+    .fanhui{
+        font-size: 16px;
+        color: #fff;
+        font-weight: 900;
+        font-style: italic;
+        margin-top: 20px;
+        width: 336px;
+        height: 42px;
+
+    }
+    .fanhui_back{
+        position: absolute;
+        text-align: center;
+        width: 336px;
+        height: 42px;
+        line-height: 32px;
+    }
+    .money_box_1 input::-webkit-input-placeholder{
+        color: #e60f64;
+        font-size: 15px;
+    }
+    .money_box_1 input::-moz-placeholder{
+        color: #e60f64;
+    }
+    .money_box_1 input:-ms-input-placeholder{
+        color: #e60f64;
+    }
+    .checked{
+        position: relative;
+        color: #e60f64;
+        font-size: 15px;
+        margin-top: 20px;
+    }
+    .checked span{
+        text-decoration: underline;
+    }
+    .exit{
+        position: absolute;
+        top: 0px;
+        color: #fff;
+        font-size:30px;
+        right: 10px;
+    }
+    #qrcode{
+        border:10px solid #fff;
+        margin: 40px 0;
+        width: 132px;
+        height: 132px;
+        background-color: #fff;
+    }
+    .rqTishi{
+        text-align: center;
+        color: #655e63;
+        font-size: 15px;
+    }
+</style>
+
